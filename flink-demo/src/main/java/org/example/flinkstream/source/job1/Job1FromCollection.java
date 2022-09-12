@@ -26,7 +26,7 @@ public class Job1FromCollection {
         SingleOutputStreamOperator<String> result = stringDataStreamSource.map(new MapFunction<String, String>() {
             @Override
             public String map(String s) throws Exception {
-                return s + "map operator";
+                return s + " map operator";
             }
         });
         result.print();
