@@ -46,6 +46,8 @@ public class CountWindowAverageWithValueState extends RichFlatMapFunction<Tuple2
 
     @Override
     public void flatMap(Tuple2<Long, Long> longLongTuple2, Collector<Tuple2<Long, Double>> collector) throws Exception {
+        // 可以在这里打印一些信息到控制台上作为验证。
+
         // 拿到当前的key的状态值
         Tuple2<Long, Long> currentState = countAndSum.value();
 
