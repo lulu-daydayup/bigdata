@@ -22,7 +22,9 @@ public class TestKeyedStateMain {
         dataStreamSource.keyBy(0)
 //                .flatMap(new CountWindowAverageWithValueState())
 //                .flatMap(new CountWindowAverageWithListState())
-                .flatMap(new CountWindowAverageWithMapState())
+//                .flatMap(new CountWindowAverageWithMapState())
+//                .flatMap(new SumFuntion())
+                .flatMap(new ContainsValueFunction())
                 .print();
 
         env.execute("TestKeyedStateMain");
