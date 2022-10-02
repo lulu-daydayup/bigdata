@@ -1,4 +1,4 @@
-package org.example.flinkstream.window;
+package org.example.flinkstream.window.job2;
 
 
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -23,6 +23,7 @@ public class TimeWindowCountTest {
 
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        env.setParallelism(1);
         env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
         DataStreamSource<String> dataStreamSource = env.socketTextStream("localhost", 9999);
         dataStreamSource.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
