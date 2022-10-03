@@ -21,6 +21,8 @@ import java.util.concurrent.TimeUnit;
  * 第二个事件在13的时候产生因为网络延迟等原因，在19秒的时候才发送出去，第三个事件16 秒的时候发送了出去。
  * <p>
  * 按照的是事件达到Flink的时间处理的，不是事件的发生的时间。
+ *
+ * Process Time Window 无序
  * <p>
  * author: xinglu
  * date 2022/9/24 11:34 AM
@@ -30,7 +32,7 @@ public class WindowBySort2 {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
-        DataStreamSource<String> dataStreamSource = env.addSource(new WindowWordCountSortTest.TestSource());
+        DataStreamSource<String> dataStreamSource = env.addSource(new TestSource());
         dataStreamSource.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
                     @Override
                     public void flatMap(String line, Collector<Tuple2<String, Integer>> collector) throws Exception {
@@ -41,7 +43,7 @@ public class WindowBySort2 {
                     }
                 }).keyBy(0)
                 .timeWindow(Time.seconds(10), Time.seconds(5))
-                .process(new WindowWordCountSortTest.SumProcessFunction()).print().setParallelism(1);
+                .process(new SumProcessFunction()).print().setParallelism(1);
         env.execute("WindowBySort2");
 
     }
@@ -55,7 +57,7 @@ public class WindowBySort2 {
             String currentTime = String.valueOf(System.currentTimeMillis());
             System.out.println(currentTime);
 
-            // 这个操作是我为了保证10秒的背数。1000ms等于1s.
+            // 这个操作是我为了保证10秒的倍数。1000ms等于1s.
             while (Integer.parseInt(currentTime.substring(currentTime.length() - 4)) > 10) {
                 currentTime = String.valueOf(System.currentTimeMillis());
                 continue;
@@ -63,14 +65,18 @@ public class WindowBySort2 {
 
             System.out.println("开始发送事件的事件： " + dateFormat.format(System.currentTimeMillis()));
 
-            // 13s
+            // 13s,实际上我们的数据是在13s的时候生成的，只是19的时候被发送出去。
             TimeUnit.SECONDS.sleep(3);
-            sourceContext.collect("flink");
-            sourceContext.collect("flink");
+            String event = "flink";
+            sourceContext.collect(event);
 
             // 16s
             TimeUnit.SECONDS.sleep(3);
-            sourceContext.collect("flink");
+            sourceContext.collect(event);
+
+            //19s 第三个事件发送
+            TimeUnit.SECONDS.sleep(3);
+            sourceContext.collect(event);
 
             // 程序等待
             TimeUnit.SECONDS.sleep(50000);

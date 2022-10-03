@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * description: 自定义source模拟：第13秒的时候连续发送2个事件，第16秒的时候再发送1个事件
+ * Process Time Window 有序
  * author: xinglu
  * date 2022/9/24 11:14 AM
  */

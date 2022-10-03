@@ -1,4 +1,4 @@
-package org.example.flinkstream.window.job5;
+package org.example.flinkstream.window.job6;
 
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -14,23 +14,25 @@ import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
+import org.example.flinkstream.window.job5.WindowWordCountAndTime;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Description: 使用Event Time处理无序
- *
- * 打印结果：1，3，1。但是有数据的丢失。
- *
- * @date 2022/9/30 11:54 AM
+ * Description: 使用WaterMark机制解决无序, 结果：解决了数据丢失的情况。
+ * 开始发送事件的时间： 11:21:50
+ * (flink,2)
+ * (flink,3)
+ * (flink,1)
+ * @date 2022/10/3 11:18 AM
  **/
-public class WindowWordCountAndTime {
+public class WindowWordCountAndTime2 {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         // 步骤一：设置时间类型，默认的是ProcessTime
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-        DataStreamSource<String> dataStreamSource = env.addSource(new TestSource());
+        DataStreamSource<String> dataStreamSource = env.addSource(new WindowWordCountAndTime.TestSource());
         dataStreamSource.map(new MapFunction<String, Tuple2<String, Long>>() {
                     @Override
                     public Tuple2<String, Long> map(String s) throws Exception {
@@ -43,7 +45,7 @@ public class WindowWordCountAndTime {
                 .timeWindow(Time.seconds(10), Time.seconds(5))
                 .process(new SumProcessFunction()).print().setParallelism(1);
 
-        env.execute("WindowWordCountAndTime");
+        env.execute("WindowWordCountAndTime2");
     }
 
     public static class TestSource implements SourceFunction<String> {
@@ -80,10 +82,12 @@ public class WindowWordCountAndTime {
     }
 
     private static class EventTimeExtractor implements AssignerWithPeriodicWatermarks<Tuple2<String, Long>> {
+        // 设置5s的延迟(乱序)
         @Nullable
         @Override
         public Watermark getCurrentWatermark() {
-            return new Watermark(System.currentTimeMillis());
+//            System.out.println("water mark:......" + System.currentTimeMillis());
+            return new Watermark(System.currentTimeMillis() - 5000);
         }
 
         // 指定时间，按照那个数据产生的时间进行处理
@@ -105,6 +109,4 @@ public class WindowWordCountAndTime {
             out.collect(Tuple2.of(key.getField(0), count));
         }
     }
-
-
 }
