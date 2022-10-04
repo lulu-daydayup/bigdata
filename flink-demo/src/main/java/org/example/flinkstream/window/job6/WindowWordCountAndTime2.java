@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
  * (flink,2)
  * (flink,3)
  * (flink,1)
+ *
  * @date 2022/10/3 11:18 AM
  **/
 public class WindowWordCountAndTime2 {
@@ -32,7 +33,7 @@ public class WindowWordCountAndTime2 {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         // 步骤一：设置时间类型，默认的是ProcessTime
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-        DataStreamSource<String> dataStreamSource = env.addSource(new WindowWordCountAndTime.TestSource());
+        DataStreamSource<String> dataStreamSource = env.addSource(new TestSource());
         dataStreamSource.map(new MapFunction<String, Tuple2<String, Long>>() {
                     @Override
                     public Tuple2<String, Long> map(String s) throws Exception {
@@ -81,7 +82,13 @@ public class WindowWordCountAndTime2 {
         }
     }
 
+    /**
+     * 使用WaterMark需要实现AssignerWithPeriodicWatermarks接口
+     * 重写方法。
+     */
     private static class EventTimeExtractor implements AssignerWithPeriodicWatermarks<Tuple2<String, Long>> {
+        FastDateFormat dateFormat = FastDateFormat.getInstance("HH:mm:ss");
+
         // 设置5s的延迟(乱序)
         @Nullable
         @Override
@@ -93,6 +100,7 @@ public class WindowWordCountAndTime2 {
         // 指定时间，按照那个数据产生的时间进行处理
         @Override
         public long extractTimestamp(Tuple2<String, Long> element, long recordTimestamp) {
+            System.out.println("event: " + dateFormat.format(element.f1) + ", currentWaterMark: " + dateFormat.format(getCurrentWatermark().getTimestamp()));
             return element.f1;
         }
     }
@@ -102,11 +110,14 @@ public class WindowWordCountAndTime2 {
 
         @Override
         public void process(Tuple key, ProcessWindowFunction<Tuple2<String, Long>, Tuple2<String, Integer>, Tuple, TimeWindow>.Context context, Iterable<Tuple2<String, Long>> elements, Collector<Tuple2<String, Integer>> out) throws Exception {
+            System.out.println("处理时间： " + dateFormat.format(context.currentProcessingTime()));
+            System.out.println("Window Start Time: " + dateFormat.format(context.window().getStart()));
             int count = 0;
             for (Tuple2<String, Long> element : elements) {
                 count++;
             }
             out.collect(Tuple2.of(key.getField(0), count));
+            System.out.println("Window End Time: " + dateFormat.format(context.window().getEnd()));
         }
     }
 }
