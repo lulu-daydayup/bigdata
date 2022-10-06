@@ -40,6 +40,8 @@ public class WindowCountAndTimeByWaterMark {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
+        // 多并行度的测试
+        // env.setParallelism(2);
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
         // 收集迟到的数据，推荐
@@ -89,8 +91,11 @@ public class WindowCountAndTimeByWaterMark {
         public long extractTimestamp(Tuple2<String, Long> element, long recordTimestamp) {
             Long currentElementTime = element.f1;
             currentMaxEventTime = Math.max(currentMaxEventTime, currentElementTime);
-            System.out.println("event = " + element
-                    + " Event Time: " + dateFormat.format(currentElementTime)
+
+            long id = Thread.currentThread().getId();
+
+            System.out.println("当前线程id=" + id + " event = " + element
+                    + " Event Time: " + dateFormat.format(element.f1)
                     + " Max Event Time: " + dateFormat.format(currentMaxEventTime)
                     + " Current Water Mark: " + dateFormat.format(getCurrentWatermark().getTimestamp()));
             return currentElementTime;
