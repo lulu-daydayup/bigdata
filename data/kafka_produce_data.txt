@@ -1,0 +1,7 @@
+{"dt":"2021-06-03 10:51:54","countryCode":"IN","data":[{"type":"s1","score":0.5,"level":"C"},{"type":"s4","score":0.1,"level":"C"}]}
+{"dt":"2021-06-03 10:51:56","countryCode":"HK","data":[{"type":"s3","score":0.3,"level":"A"},{"type":"s4","score":0.3,"level":"A"}]}
+{"dt":"2021-06-03 10:51:58","countryCode":"TW","data":[{"type":"s1","score":0.8,"level":"B"},{"type":"s2","score":0.1,"level":"D"}]}
+{"dt":"2021-06-03 10:52:00","countryCode":"SA","data":[{"type":"s1","score":0.8,"level":"C"},{"type":"s5","score":0.1,"level":"D"}]}
+{"dt":"2021-06-03 10:52:02","countryCode":"KW","data":[{"type":"s1","score":0.5,"level":"C"},{"type":"s2","score":0.5,"level":"A+"}]}
+{"dt":"2021-06-03 10:52:04","countryCode":"US","data":[{"type":"s1","score":0.5,"level":"C"},{"type":"s5","score":0.8,"level":"D"}]}
+{"dt":"2021-06-03 10:52:06","countryCode":"PK","data":[{"type":"s4","score":0.5,"level":"A"},{"type":"s1","score":0.3,"level":"A+"}]}

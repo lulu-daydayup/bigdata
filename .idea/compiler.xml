@@ -6,10 +6,21 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="spark-demo" />
         <module name="flink-demo" />
         <module name="antlr4-demo" />
+        <module name="spring-boot-demo" />
+        <module name="spark-demo" />
+        <module name="java_demo" />
       </profile>
     </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="antlr4-demo" options="-parameters" />
+      <module name="flink-demo" options="-parameters" />
+      <module name="java_demo" options="-parameters" />
+      <module name="spark-demo" options="-parameters" />
+      <module name="spring-boot-demo" options="-parameters" />
+    </option>
   </component>
 </project>
