@@ -28,3 +28,4 @@ target/
 *.ear
 
 #media
+/.idea/
